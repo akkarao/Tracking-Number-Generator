@@ -1,0 +1,37 @@
+package com.number.tracking;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
+
+@RestController
+@RequestMapping("/next-tracking-number")
+public class NextTrackingNumberController {
+
+    private static final AtomicLong counter = new AtomicLong();
+
+    @GetMapping
+    public TrackingNumberResponse generateTrackingNumber(
+            @RequestParam String origin_country_id,
+            @RequestParam String destination_country_id,
+            @RequestParam double weight,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime created_at,
+            @RequestParam UUID customer_id,
+            @RequestParam String customer_name,
+            @RequestParam String customer_slug) {
+
+        String trackingId = (customer_slug.substring(0, Math.min(4, customer_slug.length())) + 
+                Long.toString(System.currentTimeMillis(), 36).toUpperCase() +
+                counter.incrementAndGet()).replaceAll("[^A-Z0-9]", "").toUpperCase();
+
+        if (trackingId.length() > 16) {
+            trackingId = trackingId.substring(0, 16);
+        }
+
+        return new TrackingNumberResponse(trackingId, created_at.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+    }
+}
