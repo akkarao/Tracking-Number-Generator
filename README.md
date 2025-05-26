@@ -24,4 +24,5 @@ GET /next-tracking-number
 - Java 17+
 - Maven 3+
 
-
+# Clone the repo
+git clone https://github.com/akkarao/Tracking-Number-Generator.git
